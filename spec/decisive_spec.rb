@@ -13,19 +13,23 @@ RSpec.describe Decisive do
     ]
 
     template = Struct.new(:source).new <<~DECISIVE
-      @filename = "test.csv"
-      column :a
-      column :b
-      column :c
+      csv @records, filename: "test.csv" do
+        column :a
+        column :b, label: "Badgers"
+        column :c
+        column :sum do |record|
+          record.a + record.b + record.c
+        end
+      end
     DECISIVE
 
     result = eval(Decisive::TemplateHandler.call(template))
 
     expect(result).to eq <<~CSV
-      A,B,C
-      1,2,3
-      4,5,6
-      7,8,9
+      A,Badgers,C,Sum
+      1,2,3,6
+      4,5,6,15
+      7,8,9,24
     CSV
 
     expect(response.headers).to eq({

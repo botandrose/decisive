@@ -25,6 +25,12 @@ module Decisive
     def self.extended object
       object.instance_variable_set :@columns, []
     end
+    
+    def csv records, filename:, &block
+      @filename = filename
+      @records = records
+      instance_eval &block
+    end
 
     class Column < Struct.new(:field, :label, :block); end
 

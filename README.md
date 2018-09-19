@@ -35,13 +35,12 @@ end
 ```ruby
 # app/views/users/index.csv.decisive
 
-@filename = "users-#{Time.zone.now.strftime("%Y_%m_%d")}.csv"
-@records = @users
-
-column :email
-column :name, label: "Full name"
-column :signed_up do |user|
-  user.created_at.to_date
+csv @users, filename: "users-#{Time.zone.now.strftime("%Y_%m_%d")}.csv" do
+  column :email
+  column :name, label: "Full name"
+  column :signed_up do |user|
+    user.created_at.to_date
+  end
 end
 ```
 
