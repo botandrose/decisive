@@ -45,11 +45,11 @@ end
 ```
 
 Then visit /users.csv to get file named "users-2010_01_01.csv" with the following contents:
-```csv
-Email,Full name,Signed up
-frodo@example.com,Frodo Baggins,2010-01-01
-sam@example.com,Samwise Gamgee,2010-01-01
-```
+
+| Email             | Full name      | Signed up  |
+| ----------------- | -------------- | ---------- |
+| frodo@example.com | Frodo Baggins  | 2002-06-19 |
+| sam@example.com   | Samwise Gamgee | 2008-10-13 |
 
 ## Development
 
