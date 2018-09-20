@@ -2,6 +2,9 @@
 
 DSL for rendering CSVs in Rails apps
 
+[![Build Status](https://travis-ci.org/botandrose/decisive.svg?branch=master)](https://travis-ci.org/botandrose/decisive)
+[![Code Climate](https://codeclimate.com/github/botandrose/decisive/badges/gpa.svg)](https://codeclimate.com/github/botandrose/decisive)
+
 ## Usage
 
 Example usage:
