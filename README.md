@@ -22,12 +22,10 @@ end
 ```ruby
 # app/views/users/index.csv.decisive
 
-csv @users, filename: "users-#{Time.zone.now.strftime("%Y_%m_%d")}.csv" do
-  column :email
-  column :name, label: "Full name"
-  column :signed_up do |user|
-    user.created_at.to_date
-  end
+csv @users, filename: "users-#{Time.zone.now.strftime("%Y_%m_%d")}.csv" do |user|
+  column "Email" # omitted accessor field gets inferred: user.email
+  column "Full name", :name # explicit accessor field: user.name
+  column "Signed up", user.created_at.to_date # other values get passed straight through
 end
 ```
 
