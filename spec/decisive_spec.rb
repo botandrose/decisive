@@ -4,6 +4,7 @@ RSpec.describe Decisive do
   Record = Struct.new(:a, :b, :c)
 
   let(:response) { double(headers: {}) }
+  let(:controller) { double }
 
   before do
     @records = [
@@ -35,7 +36,9 @@ RSpec.describe Decisive do
     CSV
 
     expect(response.headers).to eq({
-      "Content-Disposition" => %(attachment; filename="test.csv")
+      "Content-Disposition" => %(attachment; filename="test.csv"),
+      "Content-Type" => "text/csv",
+      "Content-Transfer-Encoding" => "binary",
     })
   end
 
@@ -65,7 +68,9 @@ RSpec.describe Decisive do
     CSV
 
     expect(response.headers).to eq({
-      "Content-Disposition" => %(attachment; filename="test.csv")
+      "Content-Disposition" => %(attachment; filename="test.csv"),
+      "Content-Type" => "text/csv",
+      "Content-Transfer-Encoding" => "binary",
     })
   end
 end

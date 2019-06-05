@@ -12,8 +12,21 @@ module Decisive
       <<~RUBY
         extend Decisive::DSL
         context = (#{template.source})
+        response.headers["Content-Type"] = "text/csv"
+        response.headers["Content-Transfer-Encoding"] = "binary"
         response.headers["Content-Disposition"] = %(attachment; filename="\#{context.filename}")
-        context.to_csv
+
+        if controller.respond_to?(:new_controller_thread) # has AC::Live mixed in
+          begin
+            context.each do |row|
+              response.stream.write row.to_csv
+            end
+          ensure
+            response.stream.close
+          end
+        else
+          context.to_csv
+        end
       RUBY
     end
   end
@@ -25,6 +38,11 @@ module Decisive
   end
 
   class Context < Struct.new(:records, :filename, :block)
+    def each &block
+      block.call header
+      body.each &block.method(:call)
+    end
+
     def to_csv
       (header + body).map(&:to_csv).join
     end
