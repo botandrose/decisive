@@ -20,7 +20,7 @@ module Decisive
         if controller.respond_to?(:new_controller_thread) # has AC::Live mixed in
           begin
             context.each do |row|
-              response.stream.write row.to_csv
+              response.stream.write row.to_csv(force_quotes: true)
             end
             raise if Rails.env.test? # WTF WTF without this the stream isn't closed in test mode??? WTF WTF
           ensure
@@ -91,8 +91,10 @@ module Decisive
   end
 
   class RenderContext < Struct.new(:records, :filename, :block)
-    def to_csv
-      (header + body).map(&:to_csv).join
+    def to_csv(*args, **kwargs)
+      (header + body).map do |row|
+        row.to_csv(*args, **kwargs)
+      end.join
     end
 
     private

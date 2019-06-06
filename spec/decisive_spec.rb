@@ -28,10 +28,10 @@ RSpec.describe Decisive do
       DECISIVE
 
 
-      expect(response.stream).to receive(:write).with("A,Badgers,C,Sum\n")
-      expect(response.stream).to receive(:write).with("1,2,3,6\n")
-      expect(response.stream).to receive(:write).with("4,5,6,15\n")
-      expect(response.stream).to receive(:write).with("7,8,9,24\n")
+      expect(response.stream).to receive(:write).with(%("A","Badgers","C","Sum"\n))
+      expect(response.stream).to receive(:write).with(%("1","2","3","6"\n))
+      expect(response.stream).to receive(:write).with(%("4","5","6","15"\n))
+      expect(response.stream).to receive(:write).with(%("7","8","9","24"\n))
       expect(response.stream).to receive(:close)
 
       eval(Decisive::TemplateHandler.call(template))
@@ -61,10 +61,10 @@ RSpec.describe Decisive do
         end
       DECISIVE
 
-      expect(response.stream).to receive(:write).with("A,Badgers,C,D\n")
-      expect(response.stream).to receive(:write).with("1,2,3,D\n")
-      expect(response.stream).to receive(:write).with("4,5,6,D\n")
-      expect(response.stream).to receive(:write).with("7,8,9,D\n")
+      expect(response.stream).to receive(:write).with(%("A","Badgers","C","D"\n))
+      expect(response.stream).to receive(:write).with(%("1","2","3","D"\n))
+      expect(response.stream).to receive(:write).with(%("4","5","6","D"\n))
+      expect(response.stream).to receive(:write).with(%("7","8","9","D"\n))
       expect(response.stream).to receive(:close)
 
       eval(Decisive::TemplateHandler.call(template))
