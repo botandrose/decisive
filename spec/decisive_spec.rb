@@ -23,7 +23,7 @@ RSpec.describe Decisive do
           column "A"
           column "Badgers", :b
           column "C"
-          column "Sum" do |record| record.a + record.b + record.c; end
+          column("Sum") { |record| record.a + record.b + record.c }
         end
       DECISIVE
 
