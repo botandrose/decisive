@@ -22,7 +22,7 @@ module Decisive
             context.each do |row|
               response.stream.write row.to_csv
             end
-            raise if ENV["RAILS_ENV"] == "test" # WTF WTF without this the stream isn't closed in test mode??? WTF WTF
+            raise if Rails.env.test? # WTF WTF without this the stream isn't closed in test mode??? WTF WTF
           ensure
             response.stream.close
           end

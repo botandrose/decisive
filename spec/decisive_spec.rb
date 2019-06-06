@@ -3,6 +3,8 @@ RSpec.describe Decisive do
 
   Record = Struct.new(:a, :b, :c)
 
+  before { stub_const "Rails", double(env: double(test?: false)) }
+
   let(:response) { double(headers: {}, stream: double) }
   let(:controller) { double }
 
