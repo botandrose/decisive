@@ -28,7 +28,7 @@ module Decisive
           end
           ""
         else
-          context.to_csv
+          context.to_csv(force_quotes: true)
         end
       RUBY
     end

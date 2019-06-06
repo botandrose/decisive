@@ -145,10 +145,10 @@ RSpec.describe Decisive do
       result = eval(Decisive::TemplateHandler.call(template))
 
       expect(result).to eq <<~CSV
-        A,Badgers,C,Sum
-        1,2,3,6
-        4,5,6,15
-        7,8,9,24
+        "A","Badgers","C","Sum"
+        "1","2","3","6"
+        "4","5","6","15"
+        "7","8","9","24"
       CSV
 
       expect(response.headers).to eq({
@@ -177,10 +177,10 @@ RSpec.describe Decisive do
       result = eval(Decisive::TemplateHandler.call(template))
 
       expect(result).to eq <<~CSV
-        A,Badgers,C,D
-        1,2,3,D
-        4,5,6,D
-        7,8,9,D
+        "A","Badgers","C","D"
+        "1","2","3","D"
+        "4","5","6","D"
+        "7","8","9","D"
       CSV
 
       expect(response.headers).to eq({
