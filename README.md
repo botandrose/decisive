@@ -70,6 +70,28 @@ Visiting /users.csv will render a file named "users-2010_01_01.csv" with the fol
 | frodo@example.com | Frodo Baggins  | Yes      |       | 2002-06-19 |
 | sam@example.com   | Samwise Gamgee |          | Frodo | 2008-10-13 |
 
+### Debugging
+
+Errors in your decisive template will often be swallowed while streaming is enabled, resulting in only some of the csv being rendered, without any explanation. You can temporarily switch decisive into non-streaming mode to see these errors:
+
+```ruby
+# decisive template
+
+csv @records, filename: "report.csv", stream: false do
+  ...
+end
+```
+
+```ruby
+# controller
+
+class ReportController < ApplicationController
+  # include ActionController::Live
+
+  ...
+end
+```
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
