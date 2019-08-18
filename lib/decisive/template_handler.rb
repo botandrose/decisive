@@ -8,10 +8,10 @@ module Decisive
       ActionView::Template.register_template_handler 'decisive', self
     end
 
-    def self.call template
+    def self.call template, source=template.source
       <<~RUBY
         extend Decisive::DSL
-        context = (#{template.source})
+        context = (#{source})
 
         response.headers["Content-Type"] = "text/csv"
         response.headers["Content-Transfer-Encoding"] = "binary"
