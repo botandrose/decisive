@@ -119,6 +119,39 @@ RSpec.describe Decisive do
 
       expect { eval(Decisive::TemplateHandler.call(template)) }.to raise_error(Decisive::StreamingNotEnabledByControllerError)
     end
+
+    it "can handle nil values" do
+      allow(controller).to receive(:new_controller_thread).and_return(true)
+
+      @records = [
+        Record.new(1,2,3),
+        Record.new(4,5,6),
+        Record.new(7,8,9),
+      ]
+
+      template = Struct.new(:source).new <<~DECISIVE
+        csv @records, filename: "test.csv" do
+          column "A"
+          column "Badgers", :b
+          column "C"
+          column("D") { nil }
+        end
+      DECISIVE
+
+      expect(response.stream).to receive(:write).with(%("A","Badgers","C","D"\n))
+      expect(response.stream).to receive(:write).with(%("1","2","3",""\n))
+      expect(response.stream).to receive(:write).with(%("4","5","6",""\n))
+      expect(response.stream).to receive(:write).with(%("7","8","9",""\n))
+      expect(response.stream).to receive(:close)
+
+      eval(Decisive::TemplateHandler.call(template))
+
+      expect(response.headers).to eq({
+        "Content-Disposition" => %(attachment; filename="test.csv"),
+        "Content-Type" => "text/csv",
+        "Content-Transfer-Encoding" => "binary",
+      })
+    end
   end
 
   context "#csv stream: false" do
@@ -181,6 +214,38 @@ RSpec.describe Decisive do
         "1","2","3","D"
         "4","5","6","D"
         "7","8","9","D"
+      CSV
+
+      expect(response.headers).to eq({
+        "Content-Disposition" => %(attachment; filename="test.csv"),
+        "Content-Type" => "text/csv",
+        "Content-Transfer-Encoding" => "binary",
+      })
+    end
+
+    it "can handle nil values" do
+      @records = [
+        Record.new(1,2,3),
+        Record.new(4,5,6),
+        Record.new(7,8,9),
+      ]
+
+      template = Struct.new(:source).new <<~DECISIVE
+        csv @records, filename: "test.csv", stream: false do
+          column "A"
+          column "Badgers", :b
+          column "C"
+          column "D", nil
+        end
+      DECISIVE
+
+      result = eval(Decisive::TemplateHandler.call(template))
+
+      expect(result).to eq <<~CSV
+        "A","Badgers","C","D"
+        "1","2","3",""
+        "4","5","6",""
+        "7","8","9",""
       CSV
 
       expect(response.headers).to eq({

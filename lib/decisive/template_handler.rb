@@ -120,6 +120,8 @@ module Decisive
     end
 
     class Row < Struct.new(:record, :block)
+      module Nothing; end
+
       def to_hash
         @hash = {}
         instance_exec record, &block
@@ -128,12 +130,12 @@ module Decisive
 
       private
 
-      def column key, value=nil, &block
+      def column key, value=Nothing, &block
         @hash[key] = if block_given?
           block.call(record)
         elsif value.is_a?(Symbol)
           record.send(value)
-        elsif value.nil?
+        elsif value == Nothing
           record.send(key.parameterize.underscore.to_sym)
         else
           value
