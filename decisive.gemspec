@@ -24,9 +24,11 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "actionview"
+  spec.add_dependency "spreadsheet"
 
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "appraisal"
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec", "~> 3.0"
+  spec.add_development_dependency "simple-spreadsheet"
 end

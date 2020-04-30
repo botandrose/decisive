@@ -1,6 +1,7 @@
 require "csv"
 require "action_view"
 require "active_support/core_ext/string/inflections"
+require "spreadsheet"
 
 module Decisive
   class TemplateHandler
@@ -13,22 +14,29 @@ module Decisive
         extend Decisive::DSL
         context = (#{source})
 
-        response.headers["Content-Type"] = "text/csv"
         response.headers["Content-Transfer-Encoding"] = "binary"
         response.headers["Content-Disposition"] = %(attachment; filename="\#{context.filename}")
 
-        if controller.respond_to?(:new_controller_thread) # has AC::Live mixed in
-          begin
-            context.each do |row|
-              response.stream.write row.to_csv(force_quotes: true)
+        if context.csv?
+          response.headers["Content-Type"] = "text/csv"
+
+          if controller.respond_to?(:new_controller_thread) # has AC::Live mixed in
+            begin
+              context.each do |row|
+                response.stream.write row.to_csv(force_quotes: true)
+              end
+              raise if Rails.env.test? # WTF WTF without this the stream isn't closed in test mode??? WTF WTF
+            ensure
+              response.stream.close
             end
-            raise if Rails.env.test? # WTF WTF without this the stream isn't closed in test mode??? WTF WTF
-          ensure
-            response.stream.close
+            ""
+          else
+            context.to_csv(force_quotes: true)
           end
-          ""
+
         else
-          context.to_csv(force_quotes: true)
+          response.headers["Content-Type"] = "application/vnd.ms-excel"
+          context.to_xls
         end
       RUBY
     end
@@ -55,6 +63,49 @@ module Decisive
       else
         RenderContext.new(records, filename, block)
       end
+    end
+
+    def xls worksheets, filename:, &block
+      XLSContext.new(worksheets, filename, block)
+    end
+  end
+
+  class XLSContext < Struct.new(:worksheets, :filename, :block)
+    def to_xls
+      to_string(render(Spreadsheet::Workbook.new))
+    end
+
+    def csv?
+      false
+    end
+
+    private
+
+    def render xls
+      worksheets.each do |name, enumerable|
+        sheet = xls.create_worksheet(name: name)
+
+        rows = to_array(enumerable)
+
+        rows.each.with_index do |row, index|
+          sheet.row(index).concat row
+        end
+      end
+      xls
+    end
+
+    def to_array records
+      context = RenderContext.new(records, nil, block)
+      context.send(:header) + context.send(:body)
+    end
+
+    def to_string xls
+      io = StringIO.new
+      xls.write(io)
+      io.rewind
+      string = io.read
+      string.force_encoding(Encoding::ASCII_8BIT)
+      string
     end
   end
 
@@ -83,6 +134,10 @@ module Decisive
       end
     end
 
+    def csv?
+      true
+    end
+
     private
 
     def header
@@ -95,6 +150,10 @@ module Decisive
       (header + body).map do |row|
         row.to_csv(*args, **kwargs)
       end.join
+    end
+
+    def csv?
+      true
     end
 
     private
