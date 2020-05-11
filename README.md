@@ -92,6 +92,29 @@ class ReportController < ApplicationController
 end
 ```
 
+## Gotchas
+
+Sometimes the streaming templates will hang in test mode. This could be because `action_controller/test_case` has been loaded, which monkeypatches AC::Live in a way that seems to breaks things. If you are running into this, try this workaround (cucumber example):
+
+```ruby
+# features/support/fix_ac_live.rb
+# requiring cucumber/rails requires rails/test_help which requires action_controller/test_case which redefines AC::Live#new_controller_thread to be single threaded, which breaks our downloads
+# set it back to original method definition
+
+module ActionController
+  module Live
+    silence_redefinition_of_method :new_controller_thread
+    def new_controller_thread # :nodoc:
+      Thread.new {
+        t2 = Thread.current
+        t2.abort_on_exception = true
+        yield
+      }
+    end
+  end
+end
+```
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.

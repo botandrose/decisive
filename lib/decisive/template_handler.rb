@@ -25,7 +25,6 @@ module Decisive
               context.each do |row|
                 response.stream.write row.to_csv(force_quotes: true)
               end
-              raise if Rails.env.test? # WTF WTF without this the stream isn't closed in test mode??? WTF WTF
             ensure
               response.stream.close
             end
