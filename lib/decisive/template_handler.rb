@@ -20,7 +20,7 @@ module Decisive
         if context.csv?
           response.headers["Content-Type"] = "text/csv"
 
-          if controller.respond_to?(:new_controller_thread) # has AC::Live mixed in
+          if controller.is_a?(ActionController::Live)
             begin
               context.each do |row|
                 response.stream.write row.to_csv(force_quotes: true)
@@ -57,7 +57,7 @@ module Decisive
   module DSL
     def csv records, filename:, stream: true, &block
       if stream
-        raise StreamingNotEnabledByControllerError unless controller.respond_to?(:new_controller_thread) # has AC::Live mixed in
+        raise StreamingNotEnabledByControllerError unless controller.is_a?(ActionController::Live)
         raise StreamIncompatibleBlockArgumentError if block.arity != 0
         StreamContext.new([], records, filename, &block)
       else
