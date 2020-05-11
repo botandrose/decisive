@@ -3,14 +3,14 @@ RSpec.describe Decisive do
 
   Record = Struct.new(:a, :b, :c)
 
-  before { stub_const "Rails", double(env: double(test?: false)) }
+  before { stub_const "ActionController::Live", Module.new }
 
   let(:response) { double(headers: {}, stream: double) }
   let(:controller) { double }
 
   context "#csv" do
     it "works with yielding records to #column" do
-      allow(controller).to receive(:new_controller_thread).and_return(true)
+      allow(controller).to receive(:is_a?).with(ActionController::Live).and_return(true)
 
       @records = [
         Record.new(1,2,3),
@@ -44,7 +44,7 @@ RSpec.describe Decisive do
     end
 
     it "works without yielding records" do
-      allow(controller).to receive(:new_controller_thread).and_return(true)
+      allow(controller).to receive(:is_a?).with(ActionController::Live).and_return(true)
 
       @records = [
         Record.new(1,2,3),
@@ -77,7 +77,7 @@ RSpec.describe Decisive do
     end
 
     it "raises an error when trying to yield a record to itself" do
-      allow(controller).to receive(:new_controller_thread).and_return(true)
+      allow(controller).to receive(:is_a?).with(ActionController::Live).and_return(true)
 
       @records = [
         Record.new(1,2,3),
@@ -121,7 +121,7 @@ RSpec.describe Decisive do
     end
 
     it "can handle nil values" do
-      allow(controller).to receive(:new_controller_thread).and_return(true)
+      allow(controller).to receive(:is_a?).with(ActionController::Live).and_return(true)
 
       @records = [
         Record.new(1,2,3),
