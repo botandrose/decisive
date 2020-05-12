@@ -64,4 +64,54 @@ RSpec.describe Decisive do
       })
     end
   end
+
+  context "with illegal worksheet names" do
+    it "deals with them" do
+      @worksheets = {
+        "Illegal[chars]*?:\t\n\r/\\" => [
+          Record.new(1,2,3),
+        ],
+        "'No single quote's on ends'" => [
+          Record.new(4,5,6),
+        ],
+        "Worksheet names cannot be longer than thirty-one characters" => [
+          Record.new(7,8,9),
+        ],
+      }
+
+      template = Struct.new(:source).new <<~DECISIVE
+        xls @worksheets, filename: "test.xls" do
+          column "A"
+          column "B"
+          column "C"
+        end
+      DECISIVE
+
+      FileUtils.mkdir_p "tmp"
+      path = "tmp/result.xls"
+      result = eval(Decisive::TemplateHandler.call(template))
+      File.open(path, "wb") { |io| io.write(result) }
+
+      expect(XLSHasher.new(path).to_hash).to eq({
+        "Illegal chars" => [
+          ["A","B","C"],
+          ["1","2","3"],
+        ],
+        "No single quote's on ends" => [
+          ["A","B","C"],
+          ["4","5","6"],
+        ],
+        "Worksheet names cannot be longe" => [
+          ["A","B","C"],
+          ["7","8","9"],
+        ],
+      })
+
+      expect(response.headers).to eq({
+        "Content-Disposition" => %(attachment; filename="test.xls"),
+        "Content-Type" => "application/vnd.ms-excel",
+        "Content-Transfer-Encoding" => "binary",
+      })
+    end
+  end
 end

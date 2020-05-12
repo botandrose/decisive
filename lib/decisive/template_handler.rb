@@ -82,7 +82,7 @@ module Decisive
 
     def render xls
       worksheets.each do |name, enumerable|
-        sheet = xls.create_worksheet(name: name)
+        sheet = xls.create_worksheet(name: sanitize_name(name))
 
         rows = to_array(enumerable)
 
@@ -91,6 +91,15 @@ module Decisive
         end
       end
       xls
+    end
+
+    def sanitize_name name
+      name
+        .gsub(/[\[\]\*\?:\/\\\t\n\r]/, " ")
+        .gsub(/^'/, "")
+        .gsub(/'$/, "")
+        .strip
+        .slice(0,31)
     end
 
     def to_array records
