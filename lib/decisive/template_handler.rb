@@ -11,8 +11,7 @@ module Decisive
 
     def self.call template, source=template.source
       <<~RUBY
-        extend Decisive::DSL
-        context = (#{source})
+        extend Decisive::DSL; context = (#{source})
 
         response.headers["Content-Transfer-Encoding"] = "binary"
         response.headers["Content-Disposition"] = %(attachment; filename="\#{context.filename}")

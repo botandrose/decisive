@@ -254,5 +254,20 @@ RSpec.describe Decisive do
         "Content-Transfer-Encoding" => "binary",
       })
     end
+
+    it "gives reasonable line numbers on template exception" do
+      @records = [Record.new(1,2,3)]
+
+      template = Struct.new(:source).new <<~DECISIVE
+        csv @records, filename: "test.csv", stream: false do
+          derp
+        end
+      DECISIVE
+
+      expect { eval(Decisive::TemplateHandler.call(template)) }.to raise_error { |error|
+        expect(error.message).to include("undefined local variable or method `derp'")
+        expect(error.backtrace.first).to include("(eval):2:in `block")
+      }
+    end
   end
 end
