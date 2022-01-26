@@ -1,7 +1,7 @@
 require "csv"
 require "action_view"
 require "active_support/core_ext/string/inflections"
-require "spreadsheet"
+require "caxlsx"
 
 module Decisive
   class TemplateHandler
@@ -81,7 +81,7 @@ module Decisive
     end
 
     def to_xls
-      to_string(render(Spreadsheet::Workbook.new))
+      to_string(render(Axlsx::Package.new))
     end
 
     def csv?
@@ -96,12 +96,11 @@ module Decisive
 
     def render xls
       worksheets.each do |worksheet|
-        sheet = xls.create_worksheet(name: sanitize_name(worksheet.name))
-
-        rows = to_array(worksheet)
-
-        rows.each.with_index do |row, index|
-          sheet.row(index).concat row
+        xls.workbook.add_worksheet(name: sanitize_name(worksheet.name)) do |sheet|
+          rows = to_array(worksheet)
+          rows.each do |row|
+            sheet.add_row row
+          end
         end
       end
       xls
@@ -123,7 +122,7 @@ module Decisive
 
     def to_string xls
       io = StringIO.new
-      xls.write(io)
+      io.write xls.to_stream.string
       io.rewind
       string = io.read
       string.force_encoding(Encoding::ASCII_8BIT)
@@ -134,7 +133,7 @@ module Decisive
 
   class XLSContext < Struct.new(:worksheets, :filename, :block)
     def to_xls
-      to_string(render(Spreadsheet::Workbook.new))
+      to_string(render(Axlsx::Package.new))
     end
 
     def csv?
@@ -145,12 +144,11 @@ module Decisive
 
     def render xls
       worksheets.each do |name, enumerable|
-        sheet = xls.create_worksheet(name: sanitize_name(name))
-
-        rows = to_array(enumerable)
-
-        rows.each.with_index do |row, index|
-          sheet.row(index).concat row
+        xls.workbook.add_worksheet(name: sanitize_name(name)) do |sheet|
+          rows = to_array(enumerable)
+          rows.each do |row|
+            sheet.add_row row
+          end
         end
       end
       xls
@@ -172,7 +170,7 @@ module Decisive
 
     def to_string xls
       io = StringIO.new
-      xls.write(io)
+      io.write xls.to_stream.string
       io.rewind
       string = io.read
       string.force_encoding(Encoding::ASCII_8BIT)
