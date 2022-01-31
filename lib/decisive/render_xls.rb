@@ -1,4 +1,5 @@
 require "caxlsx"
+require "decisive/renderer"
 
 module Decisive
   class XLSContext < Struct.new(:worksheets, :filename, :block)
@@ -15,8 +16,7 @@ module Decisive
     def render xls
       worksheets.each do |name, enumerable|
         xls.workbook.add_worksheet(name: sanitize_name(name)) do |sheet|
-          rows = to_array(enumerable)
-          rows.each do |row|
+          Renderer.new(enumerable, block).each do |row|
             sheet.add_row row
           end
         end
@@ -31,11 +31,6 @@ module Decisive
         .gsub(/'$/, "")
         .strip
         .slice(0,31)
-    end
-
-    def to_array records
-      context = RenderContext.new(records, nil, block)
-      context.send(:header) + context.send(:body)
     end
 
     def to_string xls

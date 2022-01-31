@@ -26,8 +26,7 @@ module Decisive
     def render xls
       worksheets.each do |worksheet|
         xls.workbook.add_worksheet(name: sanitize_name(worksheet.name)) do |sheet|
-          rows = to_array(worksheet)
-          rows.each do |row|
+          Renderer.new(worksheet.records, worksheet.block).each do |row|
             sheet.add_row row
           end
         end
@@ -42,11 +41,6 @@ module Decisive
         .gsub(/'$/, "")
         .strip
         .slice(0,31)
-    end
-
-    def to_array worksheet
-      context = RenderContext.new(worksheet.records, nil, worksheet.block)
-      context.send(:header) + context.send(:body)
     end
 
     def to_string xls
