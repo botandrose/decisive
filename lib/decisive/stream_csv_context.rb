@@ -2,7 +2,7 @@ require "csv"
 require "active_support/core_ext/string/inflections"
 
 module Decisive
-  class StreamContext < Struct.new(:columns, :records, :filename)
+  class StreamCSVContext < Struct.new(:columns, :records, :filename)
     class Column < Struct.new(:label, :block); end
 
     def initialize *args, &block

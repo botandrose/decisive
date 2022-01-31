@@ -1,12 +1,22 @@
 require "caxlsx"
+require "decisive/renderer"
 
 module Decisive
-  class XLSWithWorksheetsContext < Struct.new(:filename, :worksheets)
+  class RenderXLSContext < Struct.new(:worksheets, :filename, :block)
     class Worksheet < Struct.new(:records, :name, :block); end
 
-    def initialize *args, &block
+    def initialize *args
       super
-      instance_eval &block
+
+      self.worksheets ||= []
+      if worksheets.none?
+        instance_eval &block
+
+      else
+        self.worksheets = worksheets.map do |name, records|
+          Worksheet.new(records, name, block)
+        end
+      end
     end
 
     def to_xls

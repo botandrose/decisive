@@ -1,9 +1,8 @@
 require "action_view"
 
-require "decisive/stream_csv"
-require "decisive/render_csv"
-require "decisive/xls_with_worksheets"
-require "decisive/render_xls"
+require "decisive/stream_csv_context"
+require "decisive/render_csv_context"
+require "decisive/render_xls_context"
 
 module Decisive
   class TemplateHandler
@@ -59,18 +58,14 @@ module Decisive
       if stream
         raise StreamingNotEnabledByControllerError unless controller.is_a?(ActionController::Live)
         raise StreamIncompatibleBlockArgumentError if block.arity != 0
-        StreamContext.new([], records, filename, &block)
+        StreamCSVContext.new([], records, filename, &block)
       else
-        RenderContext.new(records, filename, block)
+        RenderCSVContext.new(records, filename, block)
       end
     end
 
     def xls worksheets=nil, filename:, &block
-      if worksheets
-        XLSContext.new(worksheets, filename, block)
-      else
-        XLSWithWorksheetsContext.new(filename, [], &block)
-      end
+      RenderXLSContext.new(worksheets, filename, block)
     end
   end
 end
