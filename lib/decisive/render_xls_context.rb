@@ -1,4 +1,4 @@
-require "caxlsx"
+require "rubyXL"
 require "decisive/renderer"
 
 module Decisive
@@ -20,7 +20,9 @@ module Decisive
     end
 
     def to_xls
-      to_string(render(Axlsx::Package.new))
+      workbook = RubyXL::Workbook.new
+      workbook.worksheets.pop # rm default worsheet
+      to_string(render(workbook))
     end
 
     def csv?
@@ -35,9 +37,15 @@ module Decisive
 
     def render xls
       worksheets.each do |worksheet|
-        xls.workbook.add_worksheet(name: sanitize_name(worksheet.name)) do |sheet|
-          Renderer.new(worksheet.records, worksheet.block).each do |row|
-            sheet.add_row row
+        sheet = xls.add_worksheet(sanitize_name(worksheet.name)).tap do |sheet|
+          Renderer.new(worksheet.records, worksheet.block).each.with_index do |row, row_index|
+            row.each.with_index do |cell, cell_index|
+              if cell[0] == "="
+                sheet.add_cell row_index, cell_index, nil, cell[1..]
+              else
+                sheet.add_cell row_index, cell_index, cell
+              end
+            end
           end
         end
       end
@@ -54,12 +62,7 @@ module Decisive
     end
 
     def to_string xls
-      io = StringIO.new
-      io.write xls.to_stream.string
-      io.rewind
-      string = io.read
-      string.force_encoding(Encoding::ASCII_8BIT)
-      string
+      xls.stream.string
     end
   end
 end

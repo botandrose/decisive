@@ -48,21 +48,21 @@ RSpec.describe Decisive do
         expect(XLSHasher.new(path).to_hash).to eq({
           "Ones" => [
             ["A","Badgers","C","D"],
-            [1,2,3,"D"],
-            [4,5,6,"D"],
-            [7,8,9,"D"],
+            ["1","2","3","D"],
+            ["4","5","6","D"],
+            ["7","8","9","D"],
           ],
           "Teens" => [
             ["A","Badgers","C","D"],
-            [11,12,13,"D"],
-            [14,15,16,"D"],
-            [17,18,19,"D"],
+            ["11","12","13","D"],
+            ["14","15","16","D"],
+            ["17","18","19","D"],
           ],
         })
 
         expect(response.headers).to eq({
           "Content-Disposition" => %(attachment; filename="test.xls"),
-          "Content-Type" => "application/vnd.ms-excel",
+          "Content-Type" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           "Content-Transfer-Encoding" => "binary",
         })
       end
@@ -100,7 +100,7 @@ RSpec.describe Decisive do
 
           expect(response.headers).to eq({
             "Content-Disposition" => %(attachment; filename="test.xls"),
-            "Content-Type" => "application/vnd.ms-excel",
+            "Content-Type" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             "Content-Transfer-Encoding" => "binary",
           })
         end
@@ -137,21 +137,21 @@ RSpec.describe Decisive do
         expect(XLSHasher.new(path).to_hash).to eq({
           "Illegal chars" => [
             ["A","B","C"],
-            [1,2,3],
+            ["1","2","3"],
           ],
           "No single quote's on ends" => [
             ["A","B","C"],
-            [4,5,6],
+            ["4","5","6"],
           ],
           "Worksheet names cannot be longe" => [
             ["A","B","C"],
-            [7,8,9],
+            ["7","8","9"],
           ],
         })
 
         expect(response.headers).to eq({
           "Content-Disposition" => %(attachment; filename="test.xls"),
-          "Content-Type" => "application/vnd.ms-excel",
+          "Content-Type" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           "Content-Transfer-Encoding" => "binary",
         })
       end
@@ -191,21 +191,21 @@ RSpec.describe Decisive do
         expect(XLSHasher.new(path).to_hash).to eq({
           "Ones" => [
             ["A","Badgers","C","D"],
-            [1,2,3,"D"],
-            [4,5,6,"D"],
-            [7,8,9,"D"],
+            ["1","2","3","D"],
+            ["4","5","6","D"],
+            ["7","8","9","D"],
           ],
           "Teens" => [
             ["A","Badgers","C","D"],
-            [11,12,13,"D"],
-            [14,15,16,"D"],
-            [17,18,19,"D"],
+            ["11","12","13","D"],
+            ["14","15","16","D"],
+            ["17","18","19","D"],
           ],
         })
 
         expect(response.headers).to eq({
           "Content-Disposition" => %(attachment; filename="test.xls"),
-          "Content-Type" => "application/vnd.ms-excel",
+          "Content-Type" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           "Content-Transfer-Encoding" => "binary",
         })
       end
@@ -243,7 +243,7 @@ RSpec.describe Decisive do
 
           expect(response.headers).to eq({
             "Content-Disposition" => %(attachment; filename="test.xls"),
-            "Content-Type" => "application/vnd.ms-excel",
+            "Content-Type" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             "Content-Transfer-Encoding" => "binary",
           })
         end
@@ -280,21 +280,56 @@ RSpec.describe Decisive do
         expect(XLSHasher.new(path).to_hash).to eq({
           "Illegal chars" => [
             ["A","B","C"],
-            [1,2,3],
+            ["1","2","3"],
           ],
           "No single quote's on ends" => [
             ["A","B","C"],
-            [4,5,6],
+            ["4","5","6"],
           ],
           "Worksheet names cannot be longe" => [
             ["A","B","C"],
-            [7,8,9],
+            ["7","8","9"],
           ],
         })
 
         expect(response.headers).to eq({
           "Content-Disposition" => %(attachment; filename="test.xls"),
-          "Content-Type" => "application/vnd.ms-excel",
+          "Content-Type" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          "Content-Transfer-Encoding" => "binary",
+        })
+      end
+    end
+
+    context "with formulasnames" do
+      it "deals with them" do
+        @worksheets = {
+          "Test" => [
+            Record.new(1, "=SUM(4,5)"),
+          ],
+        }
+
+        template = Struct.new(:source).new <<~DECISIVE
+          xls @worksheets, filename: "test.xlsx" do
+            column "A"
+            column "B"
+          end
+        DECISIVE
+
+        FileUtils.mkdir_p "tmp"
+        path = "tmp/result.xlsx"
+        result = eval(Decisive::TemplateHandler.call(template))
+        File.open(path, "wb") { |io| io.write(result) }
+
+        expect(XLSHasher.new(path).to_hash).to eq({
+          "Test" => [
+            ["A","B"],
+            ["1","=SUM(4,5)"],
+          ],
+        })
+
+        expect(response.headers).to eq({
+          "Content-Disposition" => %(attachment; filename="test.xlsx"),
+          "Content-Type" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           "Content-Transfer-Encoding" => "binary",
         })
       end

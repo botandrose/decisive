@@ -1,12 +1,21 @@
-require "roo"
+require "rubyXL"
 
 class XLSHasher < Struct.new(:path)
   def to_hash
-    spreadsheet = Roo::Spreadsheet.open(path, extension: :xlsx)
-    spreadsheet.sheets.reduce({}) do |hash, name|
+    spreadsheet = RubyXL::Parser.parse(path)
+    spreadsheet.worksheets.reduce({}) do |hash, worksheet|
       actual = []
-      spreadsheet.sheet(name).each { |row| actual << row }
-      hash.merge name => actual
+      worksheet.each do |row|
+        cells = row.cells.map do |cell|
+          if cell.formula
+            "=" + cell.formula.expression
+          else
+            cell.value
+          end
+        end
+        actual << cells
+      end
+      hash.merge worksheet.sheet_name => actual
     end
   end
 end

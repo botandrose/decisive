@@ -34,7 +34,7 @@ module Decisive
           end
 
         else
-          response.headers["Content-Type"] = "application/vnd.ms-excel"
+          response.headers["Content-Type"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
           context.to_xls
         end
       RUBY
