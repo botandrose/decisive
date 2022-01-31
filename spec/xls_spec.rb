@@ -48,15 +48,15 @@ RSpec.describe Decisive do
         expect(XLSHasher.new(path).to_hash).to eq({
           "Ones" => [
             ["A","Badgers","C","D"],
-            ["1","2","3","D"],
-            ["4","5","6","D"],
-            ["7","8","9","D"],
+            [1,2,3,"D"],
+            [4,5,6,"D"],
+            [7,8,9,"D"],
           ],
           "Teens" => [
             ["A","Badgers","C","D"],
-            ["11","12","13","D"],
-            ["14","15","16","D"],
-            ["17","18","19","D"],
+            [11,12,13,"D"],
+            [14,15,16,"D"],
+            [17,18,19,"D"],
           ],
         })
 
@@ -137,15 +137,15 @@ RSpec.describe Decisive do
         expect(XLSHasher.new(path).to_hash).to eq({
           "Illegal chars" => [
             ["A","B","C"],
-            ["1","2","3"],
+            [1,2,3],
           ],
           "No single quote's on ends" => [
             ["A","B","C"],
-            ["4","5","6"],
+            [4,5,6],
           ],
           "Worksheet names cannot be longe" => [
             ["A","B","C"],
-            ["7","8","9"],
+            [7,8,9],
           ],
         })
 
@@ -191,15 +191,15 @@ RSpec.describe Decisive do
         expect(XLSHasher.new(path).to_hash).to eq({
           "Ones" => [
             ["A","Badgers","C","D"],
-            ["1","2","3","D"],
-            ["4","5","6","D"],
-            ["7","8","9","D"],
+            [1,2,3,"D"],
+            [4,5,6,"D"],
+            [7,8,9,"D"],
           ],
           "Teens" => [
             ["A","Badgers","C","D"],
-            ["11","12","13","D"],
-            ["14","15","16","D"],
-            ["17","18","19","D"],
+            [11,12,13,"D"],
+            [14,15,16,"D"],
+            [17,18,19,"D"],
           ],
         })
 
@@ -280,15 +280,15 @@ RSpec.describe Decisive do
         expect(XLSHasher.new(path).to_hash).to eq({
           "Illegal chars" => [
             ["A","B","C"],
-            ["1","2","3"],
+            [1,2,3],
           ],
           "No single quote's on ends" => [
             ["A","B","C"],
-            ["4","5","6"],
+            [4,5,6],
           ],
           "Worksheet names cannot be longe" => [
             ["A","B","C"],
-            ["7","8","9"],
+            [7,8,9],
           ],
         })
 
