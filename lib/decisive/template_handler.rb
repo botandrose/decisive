@@ -58,7 +58,7 @@ module Decisive
       if stream
         raise StreamingNotEnabledByControllerError unless controller.is_a?(ActionController::Live)
         raise StreamIncompatibleBlockArgumentError if block.arity != 0
-        StreamCSVContext.new([], records, filename, &block)
+        StreamCSVContext.new(records, filename, block)
       else
         RenderCSVContext.new(records, filename, block)
       end

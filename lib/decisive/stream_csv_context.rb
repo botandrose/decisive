@@ -2,13 +2,16 @@ require "csv"
 require "active_support/core_ext/string/inflections"
 
 module Decisive
-  class StreamCSVContext < Struct.new(:columns, :records, :filename)
+  class StreamCSVContext < Struct.new(:records, :filename, :block)
     class Column < Struct.new(:label, :block); end
 
-    def initialize *args, &block
+    def initialize *args
       super
+      @columns = []
       instance_eval &block
     end
+
+    attr_reader :columns
 
     def column label, value=nil, &block # field, label: field.to_s.humanize, &block
       value ||= label.parameterize.underscore.to_sym
