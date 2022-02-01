@@ -1,5 +1,5 @@
 require "fileutils"
-require "./spec/support/xls_hasher"
+require "decisive/xls_hasher"
 
 RSpec.describe Decisive do
   before { Decisive::TemplateHandler.register }
@@ -45,7 +45,7 @@ RSpec.describe Decisive do
         result = eval(Decisive::TemplateHandler.call(template))
         File.open(path, "wb") { |io| io.write(result) }
 
-        expect(XLSHasher.new(path).to_hash).to eq({
+        expect(Decisive::XLSHasher.new(path).to_hash).to eq({
           "Ones" => [
             ["A","Badgers","C","D"],
             ["1","2","3","D"],
@@ -83,7 +83,7 @@ RSpec.describe Decisive do
           result = eval(Decisive::TemplateHandler.call(template))
           File.open(path, "wb") { |io| io.write(result) }
 
-          expect(XLSHasher.new(path).to_hash).to eq({
+          expect(Decisive::XLSHasher.new(path).to_hash).to eq({
             "Ones" => [
               ["A","A","A","D"],
               ["1","2","3","D"],
@@ -134,7 +134,7 @@ RSpec.describe Decisive do
         result = eval(Decisive::TemplateHandler.call(template))
         File.open(path, "wb") { |io| io.write(result) }
 
-        expect(XLSHasher.new(path).to_hash).to eq({
+        expect(Decisive::XLSHasher.new(path).to_hash).to eq({
           "Illegal chars" => [
             ["A","B","C"],
             ["1","2","3"],
@@ -188,7 +188,7 @@ RSpec.describe Decisive do
         result = eval(Decisive::TemplateHandler.call(template))
         File.open(path, "wb") { |io| io.write(result) }
 
-        expect(XLSHasher.new(path).to_hash).to eq({
+        expect(Decisive::XLSHasher.new(path).to_hash).to eq({
           "Ones" => [
             ["A","Badgers","C","D"],
             ["1","2","3","D"],
@@ -226,7 +226,7 @@ RSpec.describe Decisive do
           result = eval(Decisive::TemplateHandler.call(template))
           File.open(path, "wb") { |io| io.write(result) }
 
-          expect(XLSHasher.new(path).to_hash).to eq({
+          expect(Decisive::XLSHasher.new(path).to_hash).to eq({
             "Ones" => [
               ["A","A","A","D"],
               ["1","2","3","D"],
@@ -277,7 +277,7 @@ RSpec.describe Decisive do
         result = eval(Decisive::TemplateHandler.call(template))
         File.open(path, "wb") { |io| io.write(result) }
 
-        expect(XLSHasher.new(path).to_hash).to eq({
+        expect(Decisive::XLSHasher.new(path).to_hash).to eq({
           "Illegal chars" => [
             ["A","B","C"],
             ["1","2","3"],
@@ -320,7 +320,7 @@ RSpec.describe Decisive do
         result = eval(Decisive::TemplateHandler.call(template))
         File.open(path, "wb") { |io| io.write(result) }
 
-        expect(XLSHasher.new(path).to_hash).to eq({
+        expect(Decisive::XLSHasher.new(path).to_hash).to eq({
           "Test" => [
             ["A","B"],
             ["1","=SUM(4,5)"],
