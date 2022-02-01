@@ -2,7 +2,7 @@
 
 DSL for rendering and streaming CSVs in Rails apps
 
-[![Build Status](https://travis-ci.org/botandrose/decisive.svg?branch=master)](https://travis-ci.org/botandrose/decisive)
+[![CI Status](https://github.com/botandrose/decisive/workflows/CI/badge.svg?branch=master)](https://github.com/botandrose/decisive/actions?query=workflow%3ACI+branch%3Amaster)
 [![Code Climate](https://codeclimate.com/github/botandrose/decisive/badges/gpa.svg)](https://codeclimate.com/github/botandrose/decisive)
 
 ## Usage
