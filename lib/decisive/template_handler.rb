@@ -20,7 +20,7 @@ module Decisive
         if context.csv?
           response.headers["Content-Type"] = "text/csv"
 
-          if controller.is_a?(ActionController::Live)
+          if @stream
             begin
               context.each do |row|
                 response.stream.write row.to_csv(force_quotes: true)
@@ -55,6 +55,7 @@ module Decisive
 
   module DSL
     def csv records, filename:, stream: true, &block
+      @stream = stream
       if stream
         raise StreamingNotEnabledByControllerError unless controller.is_a?(ActionController::Live)
         raise StreamIncompatibleBlockArgumentError if block.arity != 0
