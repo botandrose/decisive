@@ -23,8 +23,11 @@ module Decisive
     end
 
     def hashes
-      @hashes ||= records.map do |record|
-        Row.new(record, block).to_hash
+      @hashes ||= begin
+        method = records.respond_to?(:find_each) ? :find_each : :each
+        records.send(method).map do |record|
+          Row.new(record, block).to_hash
+        end
       end
     end
 
