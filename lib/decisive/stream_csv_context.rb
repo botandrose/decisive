@@ -22,8 +22,7 @@ module Decisive
     def each
       yield header
 
-      method = records.respond_to?(:find_each) ? :find_each : :each
-      records.send(method) do |record|
+      records.map do |record|
         row = columns.map do |column|
           column.block.call(record).to_s
         end
