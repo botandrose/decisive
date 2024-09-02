@@ -24,6 +24,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "actionview"
+  spec.add_dependency "csv"
   spec.add_dependency "rubyXL"
 
   spec.add_development_dependency "bundler"
