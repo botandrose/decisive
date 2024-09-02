@@ -266,7 +266,7 @@ RSpec.describe Decisive do
 
       expect { eval(Decisive::TemplateHandler.call(template)) }.to raise_error { |error|
         expect(error.message).to include("undefined local variable or method `derp'")
-        expect(error.backtrace.first).to include("(eval):2:in `block")
+        expect(error.backtrace.first).to match(/(eval(.+?)):2:in `block/)
       }
     end
   end
