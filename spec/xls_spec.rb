@@ -300,11 +300,13 @@ RSpec.describe Decisive do
       end
     end
 
-    context "with formulasnames" do
-      it "deals with them" do
+    context "with values that look like formulas" do
+      it "writes them literally instead of as formulas" do
         @worksheets = {
           "Test" => [
             Record.new(1, "=SUM(4,5)"),
+            Record.new(2, "=, ="),
+            Record.new(3, "="),
           ],
         }
 
@@ -324,8 +326,13 @@ RSpec.describe Decisive do
           "Test" => [
             ["A","B"],
             ["1","=SUM(4,5)"],
+            ["2","=, ="],
+            ["3","="],
           ],
         })
+
+        cells = RubyXL::Parser.parse(path).worksheets.first.map { |row| row.cells[1] }
+        expect(cells.map(&:formula)).to eq([nil, nil, nil, nil])
 
         expect(response.headers).to eq({
           "Content-Disposition" => %(attachment; filename="test.xlsx"),

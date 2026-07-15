@@ -40,11 +40,7 @@ module Decisive
         sheet = xls.add_worksheet(sanitize_name(worksheet.name)).tap do |sheet|
           Renderer.new(worksheet.records, worksheet.block).each.with_index do |row, row_index|
             row.each.with_index do |cell, cell_index|
-              if cell.to_s[0] == "="
-                sheet.add_cell row_index, cell_index, nil, cell[1..]
-              else
-                sheet.add_cell row_index, cell_index, cell.to_s
-              end
+              sheet.add_cell row_index, cell_index, cell.to_s
             end
           end
         end

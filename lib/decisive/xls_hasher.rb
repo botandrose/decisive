@@ -7,13 +7,7 @@ module Decisive
       spreadsheet.worksheets.reduce({}) do |hash, worksheet|
         actual = []
         worksheet.each do |row|
-          cells = row.cells.map do |cell|
-            if cell.formula
-              "=" + cell.formula.expression
-            else
-              cell.value
-            end
-          end
+          cells = row.cells.map(&:value)
           actual << cells
         end
         hash.merge worksheet.sheet_name => actual
