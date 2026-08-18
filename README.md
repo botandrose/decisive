@@ -70,6 +70,25 @@ Visiting /users.csv will render a file named "users-2010_01_01.csv" with the fol
 | frodo@example.com | Frodo Baggins  | Yes      |       | 2002-06-19 |
 | sam@example.com   | Samwise Gamgee |          | Frodo | 2008-10-13 |
 
+### Helper methods
+
+Decisive evaluates the blocks in your template against its own objects, but they
+still reach the view's helper methods, just like the rest of the template:
+
+```ruby
+# app/views/users/index.csv.decisive
+
+csv @users, filename: "users.csv", stream: false do
+  column "Signed up" do |user|
+    l(user.created_at, format: :short) # a view helper
+  end
+end
+```
+
+The one thing blocks cannot see is the view's instance variables: `@users` above
+is read when the template runs, but inside a block `@users` is nil. Assign it to
+a local first, or reach for a helper method.
+
 ### Debugging
 
 Errors in your decisive template will often be swallowed while streaming is enabled, resulting in only some of the csv being rendered, without any explanation. You can temporarily switch decisive into non-streaming mode to see these errors:

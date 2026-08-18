@@ -59,14 +59,14 @@ module Decisive
       if stream
         raise StreamingNotEnabledByControllerError unless controller.is_a?(ActionController::Live)
         raise StreamIncompatibleBlockArgumentError if block.arity != 0
-        StreamCSVContext.new(records, filename, block)
+        StreamCSVContext.new(records, filename, block, self)
       else
-        RenderCSVContext.new(records, filename, block)
+        RenderCSVContext.new(records, filename, block, self)
       end
     end
 
     def xls worksheets=nil, filename:, &block
-      RenderXLSContext.new(worksheets, filename, block)
+      RenderXLSContext.new(worksheets, filename, block, self)
     end
   end
 end

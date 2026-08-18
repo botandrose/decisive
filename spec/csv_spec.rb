@@ -8,6 +8,14 @@ RSpec.describe Decisive do
   let(:response) { double(headers: {}, stream: double) }
   let(:controller) { double }
 
+  def shout text
+    text.to_s.upcase
+  end
+
+  private def whisper text
+    text.to_s.downcase
+  end
+
   context "#csv" do
     it "works with yielding records to #column" do
       allow(controller).to receive(:is_a?).with(ActionController::Live).and_return(true)
@@ -74,6 +82,25 @@ RSpec.describe Decisive do
         "Content-Type" => "text/csv",
         "Content-Transfer-Encoding" => "binary",
       })
+    end
+
+    it "calls the view's helper methods from a column block" do
+      allow(controller).to receive(:is_a?).with(ActionController::Live).and_return(true)
+
+      @records = [Record.new("badgers",2,3)]
+
+      template = Struct.new(:source).new <<~DECISIVE
+        csv @records, filename: "test.csv" do
+          column("A") { |record| shout(record.a) }
+          column("B") { |record| whisper("MUSHROOMS") }
+        end
+      DECISIVE
+
+      expect(response.stream).to receive(:write).with(%("A","B"\n))
+      expect(response.stream).to receive(:write).with(%("BADGERS","mushrooms"\n))
+      expect(response.stream).to receive(:close)
+
+      eval(Decisive::TemplateHandler.call(template))
     end
 
     it "raises an error when trying to yield a record to itself" do
@@ -253,6 +280,24 @@ RSpec.describe Decisive do
         "Content-Type" => "text/csv",
         "Content-Transfer-Encoding" => "binary",
       })
+    end
+
+    it "calls the view's helper methods from a block yielded a record" do
+      @records = [Record.new("badgers",2,3)]
+
+      template = Struct.new(:source).new <<~DECISIVE
+        csv @records, filename: "test.csv", stream: false do |record|
+          column "A", shout(record.a)
+          column("B") { whisper("MUSHROOMS") }
+        end
+      DECISIVE
+
+      result = eval(Decisive::TemplateHandler.call(template))
+
+      expect(result).to eq <<~CSV
+        "A","B"
+        "BADGERS","mushrooms"
+      CSV
     end
 
     it "gives reasonable line numbers on template exception" do

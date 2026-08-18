@@ -3,9 +3,9 @@ require "active_support/core_ext/string/inflections"
 require "decisive/renderer"
 
 module Decisive
-  class RenderCSVContext < Struct.new(:records, :filename, :block)
+  class RenderCSVContext < Struct.new(:records, :filename, :block, :view)
     def to_csv(*args, **kwargs)
-      Renderer.new(records, block).map do |row|
+      Renderer.new(records, block, view).map do |row|
         row.to_csv(*args, **kwargs)
       end.join
     end

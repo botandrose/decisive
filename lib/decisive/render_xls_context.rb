@@ -1,8 +1,11 @@
 require "rubyXL"
 require "decisive/renderer"
+require "decisive/view_delegation"
 
 module Decisive
-  class RenderXLSContext < Struct.new(:worksheets, :filename, :block)
+  class RenderXLSContext < Struct.new(:worksheets, :filename, :block, :view)
+    include ViewDelegation
+
     class Worksheet < Struct.new(:records, :name, :block); end
 
     def initialize *args
@@ -38,7 +41,7 @@ module Decisive
     def render xls
       worksheets.each do |worksheet|
         sheet = xls.add_worksheet(sanitize_name(worksheet.name)).tap do |sheet|
-          Renderer.new(worksheet.records, worksheet.block).each.with_index do |row, row_index|
+          Renderer.new(worksheet.records, worksheet.block, view).each.with_index do |row, row_index|
             row.each.with_index do |cell, cell_index|
               sheet.add_cell row_index, cell_index, cell.to_s
             end

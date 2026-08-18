@@ -1,5 +1,7 @@
+require "decisive/view_delegation"
+
 module Decisive
-  class Renderer < Struct.new(:records, :block)
+  class Renderer < Struct.new(:records, :block, :view)
     include Enumerable
 
     def each &block
@@ -24,11 +26,13 @@ module Decisive
 
     def hashes
       @hashes ||= records.map do |record|
-        Row.new(record, block).to_hash
+        Row.new(record, block, view).to_hash
       end
     end
 
-    class Row < Struct.new(:record, :block)
+    class Row < Struct.new(:record, :block, :view)
+      include ViewDelegation
+
       module Nothing; end
 
       def to_hash

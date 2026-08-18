@@ -11,6 +11,10 @@ RSpec.describe Decisive do
   let(:response) { double(headers: {}, stream: double) }
   let(:controller) { double }
 
+  def shout text
+    text.to_s.upcase
+  end
+
   context "#xls" do
     context "with worksheets specified in template" do
       before do
@@ -64,6 +68,31 @@ RSpec.describe Decisive do
           "Content-Disposition" => %(attachment; filename="test.xls"),
           "Content-Type" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           "Content-Transfer-Encoding" => "binary",
+        })
+      end
+
+      it "calls the view's helper methods from the worksheet block and its columns" do
+        template = Struct.new(:source).new <<~DECISIVE
+          records = @records
+          xls filename: "test.xls" do
+            worksheet records, name: shout("ones") do
+              column("A") { |record| shout("a" + record.a.to_s) }
+            end
+          end
+        DECISIVE
+
+        FileUtils.mkdir_p "tmp"
+        path = "tmp/result.xls"
+        result = eval(Decisive::TemplateHandler.call(template))
+        File.open(path, "wb") { |io| io.write(result) }
+
+        expect(Decisive::XLSHasher.new(path).to_hash).to eq({
+          "ONES" => [
+            ["A"],
+            ["A1"],
+            ["A4"],
+            ["A7"],
+          ],
         })
       end
 

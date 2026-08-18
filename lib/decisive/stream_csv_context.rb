@@ -1,8 +1,11 @@
 require "csv"
 require "active_support/core_ext/string/inflections"
+require "decisive/view_delegation"
 
 module Decisive
-  class StreamCSVContext < Struct.new(:records, :filename, :block)
+  class StreamCSVContext < Struct.new(:records, :filename, :block, :view)
+    include ViewDelegation
+
     class Column < Struct.new(:label, :block); end
 
     def initialize *args
